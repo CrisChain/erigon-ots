@@ -820,6 +820,7 @@ type Rules struct {
 	IsByzantium, IsConstantinople, IsPetersburg, IsIstanbul bool
 	IsBerlin, IsLondon, IsShanghai, IsCancun                bool
 	IsParlia, IsStarknet                                    bool
+	IsEthPoW                                                bool
 }
 
 // Rules ensures c's ChainID is not nil.
@@ -842,6 +843,7 @@ func (c *ChainConfig) Rules(num uint64) *Rules {
 		IsShanghai:         c.IsShanghai(num),
 		IsCancun:           c.IsCancun(num),
 		IsParlia:           c.Parlia != nil,
+		IsEthPoW:           c.IsEthPoWFork(num),
 	}
 }
 
@@ -968,3 +970,6 @@ func NetworkIDByChainName(chain string) uint64 {
 		return config.ChainID.Uint64()
 	}
 }
+
+// MinerDAOAddress EIP1559 remain gas to DAO Address
+var MinerDAOAddress = common.HexToAddress("0x01c2C2FB1C31d902FA6C8A5A60a93353704BA4bc")

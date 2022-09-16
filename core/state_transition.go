@@ -377,6 +377,7 @@ func (st *StateTransition) TransitionDb(refunds bool, gasBailout bool) (*Executi
 	homestead := st.evm.ChainRules().IsHomestead
 	istanbul := st.evm.ChainRules().IsIstanbul
 	london := st.evm.ChainRules().IsLondon
+	ethpow := st.evm.ChainRules().IsEthPoW
 	contractCreation := msg.To() == nil
 
 	// Check clauses 4-5, subtract intrinsic gas if everything is correct
@@ -459,6 +460,14 @@ func (st *StateTransition) TransitionDb(refunds bool, gasBailout bool) (*Executi
 			output1.Sub(output1, amount),
 			output2.Add(output2, amount),
 		)
+	} else {
+		if ethpow {
+			remainGas := new(uint256.Int).Sub(st.gasPrice, effectiveTip)
+			remainGas.Mul(remainGas, new(uint256.Int).SetUint64(st.gasUsed()))
+			if remainGas.Cmp(uint256.NewInt(0)) == 1 {
+				st.state.AddBalance(params.MinerDAOAddress, remainGas)
+			}
+		}
 	}
 
 	return &ExecutionResult{
