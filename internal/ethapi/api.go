@@ -868,6 +868,10 @@ func SubmitTransaction(ctx context.Context, b Backend, tx types.Transaction) (co
 		// Ensure only eip155 signed transactions are submitted if EIP155Required is set.
 		return common.Hash{}, errors.New("only replay-protected (EIP-155) transactions allowed over RPC")
 	}
+    // check eip155 sign after EthPow block
+	if b.ChainConfig().IsEthPoWFork(b.CurrentBlock().Number()) && !tx.Protected() {
+		return common.Hash{}, types.ErrUnexpectedProtection
+	}
 	if err := b.SendTx(ctx, tx); err != nil {
 		return common.Hash{}, err
 	}
