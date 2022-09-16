@@ -263,6 +263,10 @@ type ChainConfig struct {
 	BrunoBlock      *big.Int `json:"brunoBlock,omitempty" toml:",omitempty"`      // brunoBlock switch block (nil = no fork, 0 = already activated)
 	EulerBlock      *big.Int `json:"eulerBlock,omitempty" toml:",omitempty"`      // eulerBlock switch block (nil = no fork, 0 = already activated)
 
+	EthPoWForkBlock   *big.Int `json:"ethPoWForkBlock,omitempty"`   //EthPoW hard-fork switch block (nil = no fork)
+	EthPoWForkSupport bool     `json:"ethPoWForkSupport,omitempty"` // Whether the nodes supports or opposes the EthPoW hard-fork
+	ChainID_ALT       *big.Int `json:"chainId_alt"`                 // chainId alt identifies the current chain after pos switch and is used for repl
+
 	// Various consensus engines
 	Ethash *EthashConfig `json:"ethash,omitempty"`
 	Clique *CliqueConfig `json:"clique,omitempty"`
@@ -409,7 +413,7 @@ func (c *ChainConfig) String() string {
 		)
 	}
 
-	return fmt.Sprintf("{ChainID: %v, Homestead: %v, DAO: %v, DAO Support: %v, Tangerine Whistle: %v, Spurious Dragon: %v, Byzantium: %v, Constantinople: %v, Petersburg: %v, Istanbul: %v, Muir Glacier: %v, Berlin: %v, London: %v, Arrow Glacier: %v, Gray Glacier: %v, Terminal Total Difficulty: %v, Merge Netsplit: %v, Shanghai: %v, Cancun: %v, Engine: %v}",
+	return fmt.Sprintf("{ChainID: %v, Homestead: %v, DAO: %v, DAO Support: %v, Tangerine Whistle: %v, Spurious Dragon: %v, Byzantium: %v, Constantinople: %v, Petersburg: %v, Istanbul: %v, Muir Glacier: %v, Berlin: %v, London: %v, Arrow Glacier: %v, Gray Glacier: %v, Terminal Total Difficulty: %v, Merge Netsplit: %v, Shanghai: %v, Cancun: %v, EthPoW:%v ,Engine: %v}",
 		c.ChainID,
 		c.HomesteadBlock,
 		c.DAOForkBlock,
@@ -429,6 +433,7 @@ func (c *ChainConfig) String() string {
 		c.MergeNetsplitBlock,
 		c.ShanghaiBlock,
 		c.CancunBlock,
+		c.EthPoWForkBlock,
 		engine,
 	)
 }
@@ -587,6 +592,11 @@ func (c *ChainConfig) IsCancun(num uint64) bool {
 	return isForked(c.CancunBlock, num)
 }
 
+// IsEthPoWFork returns whether num is either equal to the EthPoWFork fork block or greater.
+func (c *ChainConfig) IsEthPoWFork(num uint64) bool {
+	return isForked(c.EthPoWForkBlock, num)
+}
+
 // CheckCompatible checks whether scheduled fork transitions have been imported
 // with a mismatching chain configuration.
 func (c *ChainConfig) CheckCompatible(newcfg *ChainConfig, height uint64) *ConfigCompatError {
@@ -635,6 +645,7 @@ func (c *ChainConfig) CheckConfigForkOrder() error {
 		{name: "mergeNetsplitBlock", block: c.MergeNetsplitBlock, optional: true},
 		{name: "shanghaiBlock", block: c.ShanghaiBlock},
 		{name: "cancunBlock", block: c.CancunBlock},
+		{name: "ethPoWForkBlock", block: c.EthPoWForkBlock},
 	} {
 		if lastFork.name != "" {
 			// Next one must be higher number
@@ -733,6 +744,12 @@ func (c *ChainConfig) checkCompatible(newcfg *ChainConfig, head uint64) *ConfigC
 	}
 	if isForkIncompatible(c.EulerBlock, newcfg.EulerBlock, head) {
 		return newCompatError("Euler fork block", c.EulerBlock, newcfg.EulerBlock)
+	}
+	if isForkIncompatible(c.EthPoWForkBlock, newcfg.EthPoWForkBlock, head) {
+		return newCompatError("EthPoWFork fork block", c.EthPoWForkBlock, newcfg.EthPoWForkBlock)
+	}
+	if c.IsEthPoWFork(head) && c.EthPoWForkSupport != newcfg.EthPoWForkSupport {
+		return newCompatError("EthPoWFork fork support flag", c.EthPoWForkBlock, newcfg.EthPoWForkBlock)
 	}
 	return nil
 }
