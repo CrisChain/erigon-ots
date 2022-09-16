@@ -554,6 +554,18 @@ func DefaultGenesisBlock() *Genesis {
 	}
 }
 
+// DefaultEthPoWGenesisBlock returns the Ethereum main net genesis block.
+func DefaultEthPoWGenesisBlock() *Genesis {
+	return &Genesis{
+		Config:     params.EthPoWChainConfig,
+		Nonce:      66,
+		ExtraData:  hexutil.MustDecode("0x11bbe8db4e347b4e8c937c1c8370e4b5ed33adb3db69cbdb7a38e1e50b1b82fa"),
+		GasLimit:   5000,
+		Difficulty: big.NewInt(17179869184),
+		Alloc:      readPrealloc("allocs/ethpow.json"),
+	}
+}
+
 // DefaultSepoliaGenesisBlock returns the Sepolia network genesis block.
 func DefaultSepoliaGenesisBlock() *Genesis {
 	return &Genesis{
@@ -798,6 +810,8 @@ func DefaultGenesisBlockByChainName(chain string) *Genesis {
 	switch chain {
 	case networkname.MainnetChainName:
 		return DefaultGenesisBlock()
+	case networkname.EthPoWChainName:
+		return DefaultEthPoWGenesisBlock()
 	case networkname.SepoliaChainName:
 		return DefaultSepoliaGenesisBlock()
 	case networkname.RopstenChainName:

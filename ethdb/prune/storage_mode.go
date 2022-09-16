@@ -25,6 +25,7 @@ var DefaultMode = Mode{
 
 var (
 	mainnetDepositContractBlock uint64 = 11052984
+	ethpowDepositContractBlock  uint64 = 11052984
 	sepoliaDepositContractBlock uint64 = 1273020
 	goerliDepositContractBlock  uint64 = 4367322
 )
@@ -105,6 +106,8 @@ func pruneBlockDefault(chainId uint64) uint64 {
 	switch chainId {
 	case 1 /* mainnet */ :
 		return mainnetDepositContractBlock
+	case 10001 /* ethpow */ :
+		return ethpowDepositContractBlock
 	case 11155111 /* sepolia */ :
 		return sepoliaDepositContractBlock
 	case 5 /* goerli */ :

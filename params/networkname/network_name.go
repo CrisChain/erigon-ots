@@ -17,6 +17,7 @@ const (
 	BorMainnetChainName = "bor-mainnet"
 	BorDevnetChainName  = "bor-devnet"
 	GnosisChainName     = "gnosis"
+	EthPoWChainName     = "ethpow"
 )
 
 var All = []string{
@@ -36,4 +37,5 @@ var All = []string{
 	BorMainnetChainName,
 	BorDevnetChainName,
 	GnosisChainName,
+	EthPoWChainName,
 }

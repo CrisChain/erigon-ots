@@ -75,6 +75,7 @@ var (
 	BorMainnetGenesisHash = common.HexToHash("0xa9c28ce2141b56c474f1dc504bee9b01eb1bd7d1a507580d5519d4437a97de1b")
 	BorDevnetGenesisHash  = common.HexToHash("0x5a06b25b0c6530708ea0b98a3409290e39dce6be7f558493aeb6e4b99a172a87")
 	GnosisGenesisHash     = common.HexToHash("0x4f1dd23188aab3a76b463e4af801b52b1248ef073c648cbdc4c9333d3da79756")
+	EthPoWGenesisHash     = common.HexToHash("0xd4e56740f876aef8c010b86a40d5f56745a118d0906a34e69aec8c0db1cb8fa3")
 )
 
 var (
@@ -89,6 +90,9 @@ var (
 var (
 	// MainnetChainConfig is the chain parameters to run a node on the main network.
 	MainnetChainConfig = readChainSpec("chainspecs/mainnet.json")
+
+	// EthPoWChainConfig is the chain parameters to run a node on the main network.
+	EthPoWChainConfig = readChainSpec("chainspecs/ethpow.json")
 
 	// SepoliaChainConfig contains the chain parameters to run a node on the Sepolia test network.
 	SepoliaChainConfig = readChainSpec("chainspecs/sepolia.json")
@@ -851,6 +855,8 @@ func ChainConfigByChainName(chain string) *ChainConfig {
 	switch chain {
 	case networkname.MainnetChainName:
 		return MainnetChainConfig
+	case networkname.EthPoWChainName:
+		return EthPoWChainConfig
 	case networkname.SepoliaChainName:
 		return SepoliaChainConfig
 	case networkname.RopstenChainName:
@@ -888,6 +894,8 @@ func GenesisHashByChainName(chain string) *common.Hash {
 	switch chain {
 	case networkname.MainnetChainName:
 		return &MainnetGenesisHash
+	case networkname.EthPoWChainName:
+		return &EthPoWGenesisHash
 	case networkname.SepoliaChainName:
 		return &SepoliaGenesisHash
 	case networkname.RopstenChainName:
@@ -925,6 +933,8 @@ func ChainConfigByGenesisHash(genesisHash common.Hash) *ChainConfig {
 	switch {
 	case genesisHash == MainnetGenesisHash:
 		return MainnetChainConfig
+	case genesisHash == EthPoWGenesisHash:
+		return EthPoWChainConfig
 	case genesisHash == SepoliaGenesisHash:
 		return SepoliaChainConfig
 	case genesisHash == RopstenGenesisHash:
