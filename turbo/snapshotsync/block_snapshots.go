@@ -1015,6 +1015,9 @@ func CanDeleteTo(curBlockNum uint64, snapshots *RoSnapshots) (blockTo uint64) {
 func (br *BlockRetire) RetireBlocks(ctx context.Context, blockFrom, blockTo uint64, lvl log.Lvl) error {
 	chainConfig := tool.ChainConfigFromDB(br.db)
 	chainID, _ := uint256.FromBig(chainConfig.ChainID)
+	if chainConfig.IsEthPoWFork(blockFrom) {
+		chainID, _ = uint256.FromBig(chainConfig.ChainID_ALT)
+	}
 	return retireBlocks(ctx, blockFrom, blockTo, *chainID, br.tmpDir, br.snapshots, br.db, br.workers, br.downloader, lvl, br.notifier)
 }
 
@@ -1130,6 +1133,9 @@ func dumpBlocksRange(ctx context.Context, blockFrom, blockTo uint64, tmpDir, sna
 	p := &background.Progress{}
 
 	chainId, _ := uint256.FromBig(chainConfig.ChainID)
+	if chainConfig.IsEthPoWFork(blockFrom) {
+		chainId, _ = uint256.FromBig(chainConfig.ChainID_ALT)
+	}
 	if err := buildIdx(ctx, f, *chainId, tmpDir, p, lvl); err != nil {
 		return err
 	}
@@ -1200,7 +1206,9 @@ func DumpTxs(ctx context.Context, db kv.RoDB, segmentFile, tmpDir string, blockF
 
 	chainConfig := tool.ChainConfigFromDB(db)
 	chainID, _ := uint256.FromBig(chainConfig.ChainID)
-
+	if chainConfig.IsEthPoWFork(blockFrom) {
+		chainID, _ = uint256.FromBig(chainConfig.ChainID_ALT)
+	}
 	f, err := compress.NewCompressor(ctx, "Snapshot Txs", segmentFile, tmpDir, compress.MinPatternScore, workers, lvl)
 	if err != nil {
 		return 0, fmt.Errorf("NewCompressor: %w, %s", err, segmentFile)

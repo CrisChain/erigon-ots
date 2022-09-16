@@ -100,8 +100,15 @@ func enable1344(jt *JumpTable) {
 
 // opChainID implements CHAINID opcode
 func opChainID(pc *uint64, interpreter *EVMInterpreter, callContext *ScopeContext) ([]byte, error) {
-	chainId, _ := uint256.FromBig(interpreter.evm.ChainRules().ChainID)
-	callContext.Stack.Push(chainId)
+
+	if interpreter.evm.chainConfig.IsEthPoWFork(interpreter.evm.Context().BlockNumber) {
+		chainId, _ := uint256.FromBig(interpreter.evm.chainConfig.ChainID_ALT)
+		callContext.Stack.Push(chainId)
+	} else {
+		chainId, _ := uint256.FromBig(interpreter.evm.chainConfig.ChainID)
+		callContext.Stack.Push(chainId)
+	}
+
 	return nil, nil
 }
 

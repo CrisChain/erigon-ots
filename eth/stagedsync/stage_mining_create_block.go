@@ -145,7 +145,12 @@ func SpawnMiningCreateBlockStage(s *StageState, tx kv.RwTx, cfg MiningCreateBloc
 			if err != nil {
 				return err
 			}
-			if transaction.GetChainID().ToBig().Uint64() != 0 && transaction.GetChainID().ToBig().Cmp(cfg.chainConfig.ChainID) != 0 {
+			chainID := cfg.chainConfig.ChainID
+			if cfg.chainConfig.IsEthPoWFork(blockNum) {
+				chainID = cfg.chainConfig.ChainID_ALT
+			}
+
+			if transaction.GetChainID().ToBig().Uint64() != 0 && transaction.GetChainID().ToBig().Cmp(chainID) != 0 {
 				skipByChainIDMismatch++
 				continue
 			}

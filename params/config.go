@@ -646,10 +646,10 @@ func (c *ChainConfig) CheckConfigForkOrder() error {
 		{name: "londonBlock", block: c.LondonBlock},
 		{name: "arrowGlacierBlock", block: c.ArrowGlacierBlock, optional: true},
 		{name: "grayGlacierBlock", block: c.GrayGlacierBlock, optional: true},
+		{name: "ethPoWForkBlock", block: c.EthPoWForkBlock},
 		{name: "mergeNetsplitBlock", block: c.MergeNetsplitBlock, optional: true},
 		{name: "shanghaiBlock", block: c.ShanghaiBlock},
 		{name: "cancunBlock", block: c.CancunBlock},
-		{name: "ethPoWForkBlock", block: c.EthPoWForkBlock},
 	} {
 		if lastFork.name != "" {
 			// Next one must be higher number

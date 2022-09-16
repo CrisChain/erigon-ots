@@ -86,6 +86,12 @@ func (api *APIImpl) ChainId(ctx context.Context) (hexutil.Uint64, error) {
 	if err != nil {
 		return 0, err
 	}
+
+	blockNumber, err := api.BlockNumber(ctx)
+	if err == nil && chainConfig.IsEthPoWFork(uint64(blockNumber)) {
+		return hexutil.Uint64(chainConfig.ChainID_ALT.Uint64()), nil
+	}
+
 	return hexutil.Uint64(chainConfig.ChainID.Uint64()), nil
 }
 

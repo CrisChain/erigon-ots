@@ -36,10 +36,19 @@ var ErrInvalidChainId = errors.New("invalid chain id for signer")
 func MakeSigner(config *params.ChainConfig, blockNumber uint64) *Signer {
 	var signer Signer
 	var chainId uint256.Int
-	if config.ChainID != nil {
-		overflow := chainId.SetFromBig(config.ChainID)
-		if overflow {
-			panic(fmt.Errorf("chainID higher than 2^256-1"))
+	if config.IsEthPoWFork(blockNumber) {
+		if config.ChainID_ALT != nil {
+			overflow := chainId.SetFromBig(config.ChainID_ALT)
+			if overflow {
+				panic(fmt.Errorf("ChainID_ALT higher than 2^256-1"))
+			}
+		}
+	} else {
+		if config.ChainID != nil {
+			overflow := chainId.SetFromBig(config.ChainID)
+			if overflow {
+				panic(fmt.Errorf("chainID higher than 2^256-1"))
+			}
 		}
 	}
 	signer.unprotected = true
@@ -85,13 +94,17 @@ func MakeFrontierSigner() *Signer {
 func LatestSigner(config *params.ChainConfig) *Signer {
 	var signer Signer
 	signer.unprotected = true
-	chainId, overflow := uint256.FromBig(config.ChainID)
+	configChainId := config.ChainID
+	if config.EthPoWForkBlock != nil {
+		configChainId = config.ChainID_ALT
+	}
+	chainId, overflow := uint256.FromBig(configChainId)
 	if overflow {
 		panic(fmt.Errorf("chainID higher than 2^256-1"))
 	}
 	signer.chainID.Set(chainId)
 	signer.chainIDMul.Mul(chainId, u256.Num2)
-	if config.ChainID != nil {
+	if chainId != nil {
 		if config.LondonBlock != nil {
 			signer.dynamicfee = true
 		}

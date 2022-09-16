@@ -238,6 +238,9 @@ type Config struct {
 	OverrideMergeNetsplitBlock *big.Int `toml:",omitempty"`
 
 	OverrideTerminalTotalDifficulty *big.Int `toml:",omitempty"`
+
+	//is networkid set
+	IsNetworkIdSet bool
 }
 
 type Sync struct {

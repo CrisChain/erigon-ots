@@ -235,6 +235,11 @@ func New(stack *node.Node, config *ethconfig.Config, logger log.Logger) (*Ethere
 
 	ctx, ctxCancel := context.WithCancel(context.Background())
 
+	if !config.IsNetworkIdSet && chainConfig != nil {
+		if chainConfig.ChainID_ALT != nil && chainConfig.EthPoWForkSupport {
+			config.NetworkID = chainConfig.ChainID_ALT.Uint64()
+		}
+	}
 	// kv_remote architecture does blocks on stream.Send - means current architecture require unlimited amount of txs to provide good throughput
 	//limiter := make(chan struct{}, kv.ReadersLimit)
 	backend := &Ethereum{

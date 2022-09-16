@@ -1211,6 +1211,9 @@ func DownloadAndIndexSnapshotsIfNeed(s *StageState, ctx context.Context, tx kv.R
 			// wait for Downloader service to download all expected snapshots
 			if cfg.snapshots.IndicesMax() < cfg.snapshots.SegmentsMax() {
 				chainID, _ := uint256.FromBig(cfg.chainConfig.ChainID)
+				if cfg.chainConfig.IsEthPoWFork(s.BlockNumber) {
+					chainID, _ = uint256.FromBig(cfg.chainConfig.ChainID_ALT)
+				}
 				workers := cmp.InRange(1, 2, runtime.GOMAXPROCS(-1)-1)
 				if err := snapshotsync.BuildMissedIndices(ctx, cfg.snapshots.Dir(), *chainID, cfg.tmpdir, workers, log.LvlInfo); err != nil {
 					return fmt.Errorf("BuildMissedIndices: %w", err)
